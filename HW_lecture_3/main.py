@@ -2,6 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
 
+# Ввод параметров
 R = float(input("Радиус колеса: "))
 V = float(input("Скорость центра масс колеса: "))
 frame_count = int(input("Количество кадров для анимации: "))
@@ -20,25 +21,27 @@ y = R - R * np.cos(omega * t)
 fig, ax = plt.subplots()
 ax.set_xlim(0, V * 2 * np.pi)
 ax.set_ylim(-R, 2 * R)
+line, = ax.plot([], [], lw=2, color="purple")
+trail, = ax.plot([], [], lw=1, color="blue")
 
-colors = plt.cm.Purples(np.linspace(1, 0.5, frame_count))
-
+# Функция инициализации
 def init():
-    return []
+    line.set_data([], [])
+    trail.set_data([], [])
+    return line, trail
 
+# Функция анимации
 def animate(i):
-    ax.clear()
-    ax.set_xlim(0, V * 2 * np.pi)
-    ax.set_ylim(-R, 2 * R)
-    plt.title('Анимация движения точки на ободе колеса')
-    plt.xlabel('X')
-    plt.ylabel('Y')
-    plt.grid(True)
+    # Текущая точка и траектория
+    line.set_data([x[i]], [y[i]])
+    trail.set_data(x[:i + 1], y[:i + 1])
+    return line, trail
 
-    for j in range(i):
-        ax.plot([x[j], x[j + 1]], [y[j], y[j + 1]], color=colors[j], lw=2)
-    return []
+# Создание анимации
+anim = FuncAnimation(fig, animate, init_func=init, frames=frame_count, interval=20, blit=True, repeat=False)
 
-anim = FuncAnimation(fig, animate, init_func=init, frames=len(t) - 1, interval=20, blit=True, repeat=False)
-
+plt.title('Анимация движения точки на ободе колеса')
+plt.xlabel('X')
+plt.ylabel('Y')
+plt.grid(True)
 plt.show()
